@@ -1,3 +1,5 @@
+package tankgame4;
+
 /**
  * @version 1.0
  * @Author Lee
@@ -44,7 +46,7 @@ public class Bullet implements Runnable{
             System.out.printf("子弹坐标%d, %d\n", x, y);
 
             // 当子弹在出界 或 子弹碰撞时，子弹销毁
-            if (!(x >= 0 && x <= 1000 && y >= 0 && y <= 800 && isLive) ) {
+            if (!(x >= 0 && x <= TankJFrame04.width && y >= 0 && y <= TankJFrame04.height && isLive) ) {
                 isLive = false;
                 break;
             }

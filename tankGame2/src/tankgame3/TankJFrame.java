@@ -1,3 +1,5 @@
+package tankgame3;
+
 import javax.swing.*;
 
 /**

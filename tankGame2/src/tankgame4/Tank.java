@@ -1,3 +1,5 @@
+package tankgame4;
+
 /**
  * @version 1.0
  * @Author Lee
@@ -5,9 +7,10 @@
  */
 public class Tank {
     private int x;
-    private int y;
-    private int direct;
-    private int speed = 2;
+    private int y;  // 坦克左上角坐标
+    private int direct; // direct 表示坦克方向(0:向上 1:向右 2:向下 3:向左 )
+    private int speed = 4;  // 坦克速度
+    boolean isLive = true;  // 坦克存活状态
 
     public Tank(int x, int y) {
         this.x = x;
@@ -48,16 +51,24 @@ public class Tank {
 
     // 上下左右移动
     public void moveUp() {
-        y -= speed;
+        if (y - speed >= 0) {
+            y -= speed;
+        }
     }
 
     public void moveDown() {
-        y += speed;
+        if (y + speed <= TankJFrame04.height - 60) {
+            y += speed;
+        }
     }
     public void moveLeft() {
-        x -= speed;
+        if (x - speed >= 0) {
+            x -= speed;
+        }
     }
     public void moveRight() {
-        x += speed;
+        if (x + speed <= TankJFrame04.width - 60) {
+            x += speed;
+        }
     }
 }

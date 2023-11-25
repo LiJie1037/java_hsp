@@ -1,3 +1,5 @@
+package tankgame3;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -41,7 +43,7 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
             if (enemyTank.isLive) {
                 drawTank(enemyTank.getX(), enemyTank.getY(), g, enemyTank.getDirect(), 1);
             /*
-                for (Bullet bullet : enemyTank.bullets) {
+                for (tankgame3.Bullet bullet : enemyTank.bullets) {
                     if (bullet.isLive == true) {
                         g.draw3DRect(bullet.getX(), bullet.getY(), 2, 2, false);
                     } else {
