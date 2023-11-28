@@ -1,20 +1,33 @@
-package tankgame4;
+import java.util.Vector;
 
 /**
  * @version 1.0
  * @Author Lee
- * @Date 2023/11/21 20:54
+ * @Date 2023/11/27 17:22
  */
 public class Tank {
     private int x;
-    private int y;  // 坦克左上角坐标
-    private int direct; // direct 表示坦克方向(0:向上 1:向右 2:向下 3:向左 )
-    private int speed = 2;  // 坦克速度
-    boolean isLive = true;  // 坦克存活状态
+    private int y;
+    // 0:up 1: right 2:down 3:left
+    private int direct;
+    boolean isLive = true;
+    private int speed = 5;
 
-    public Tank(int x, int y) {
+    public Bullet bullet = null;
+    Vector<Bullet> bullets = new Vector<>();
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+
+    public Tank(int x, int y, int direct) {
         this.x = x;
         this.y = y;
+        this.direct = direct;
     }
 
     public int getX() {
@@ -41,34 +54,28 @@ public class Tank {
         this.direct = direct;
     }
 
-    public int getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
-
-    // 上下左右移动
     public void moveUp() {
         if (y - speed >= 0) {
             y -= speed;
         }
     }
 
+    public void moveRight() {
+        if (x + speed <= MyFrame.width - 60) {
+            x += speed;
+        }
+    }
+
     public void moveDown() {
-        if (y + speed <= TankJFrame04.height - 60) {
+        if (y + speed <= MyFrame.height - 60) {
             y += speed;
         }
     }
+
     public void moveLeft() {
         if (x - speed >= 0) {
             x -= speed;
         }
     }
-    public void moveRight() {
-        if (x + speed <= TankJFrame04.width - 60) {
-            x += speed;
-        }
-    }
+
 }

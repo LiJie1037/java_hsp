@@ -66,7 +66,7 @@ public class EnemyTank extends Tank implements Runnable {
             setDirect((int)(Math.random() * 4));    // 随机改变方向
 
             // 根据方向创建子弹对象
-            if (isLive && bullets.size() < 3) {
+            if (isLive && bullets.size() < 5) {
                 Bullet bullet = null;
                 switch (getDirect()) {
                     case 0:
