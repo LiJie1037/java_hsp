@@ -32,6 +32,7 @@ public class Properties02 {
         properties.setProperty("charset", "unicode");
         properties.setProperty("date", "2023");
         properties.setProperty("name", "中文");
+        System.out.println(properties.get("ip"));
 
         properties.store(new FileWriter(src), null);
 
