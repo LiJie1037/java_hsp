@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @version 1.0
@@ -30,10 +32,10 @@ public class ServerConnectClientThread extends Thread {
 
     @Override
     public void run() {
+        System.out.println("\n服务端线程和客户端" + userId + " 保持通信，读取数据...");
         // Thread 在后台一直需要和客户端通信
         while (true) {
             try {
-                System.out.println("服务端和客户端" + userId + " 保持通信，读取数据...");
                 ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                 // 如果客户端没有发送 Message 对象，线程会阻塞在这里
                 Message message = (Message) ois.readObject();
@@ -64,17 +66,30 @@ public class ServerConnectClientThread extends Thread {
                     socket.close();
                     break;
                 } else if (message.getMesType().equals(MessageType.MESSAGE_COMM_MES)) { // 发送普通消息
-                    // 得到接收方的 服务器连接至客户端的线程
-                    ServerConnectClientThread serverConnectClientThread = ManageClientThread.getClientThread(message.getGetter());
-                    ObjectOutputStream oos = new ObjectOutputStream(serverConnectClientThread.getSocket().getOutputStream());
-
+                    // 设置 Message
                     Message message2 = new Message();
                     message2.setMesType(MessageType.MESSAGE_COMM_MES);
                     message2.setSender(message.getSender());
                     message2.setGetter(message.getGetter());
                     message2.setContent(message.getContent());
 
-                    oos.writeObject(message2); // 转发,提示如果客户不在线,可以保存到数据库
+                    // 得到接收方的 服务器连接至客户端的线程
+                    ServerConnectClientThread serverConnectClientThread = ManageClientThread.getClientThread(message.getGetter());
+                    if (serverConnectClientThread != null) {
+                        // 客户在线
+                        ObjectOutputStream oos = new ObjectOutputStream(serverConnectClientThread.getSocket().getOutputStream());
+                        oos.writeObject(message2); // 转发,提示如果客户不在线,可以保存到数据库
+                    } else {
+                        // 客户不在线, 保存到 offlineMes 中
+                        if (QQServer.getOfflineMes().get(message.getGetter()) != null) {
+                            // 已经有留言了
+                            QQServer.getOfflineMes().get(message.getGetter()).add(message2);
+                        } else {
+                            QQServer.getOfflineMes().put(message.getGetter(), new ArrayList<Message>(){});
+                            QQServer.getOfflineMes().get(message.getGetter()).add(message2);
+//                            QQServer.getOfflineMes().computeIfAbsent(message.getGetter(), key -> new ArrayList<>()).add(message2);
+                        }
+                    }
 
                 } else if (message.getMesType().equals(MessageType.MESSAGE_TO_ALL_MES)) {// 群发消息
                     // 发送给所有在线用户

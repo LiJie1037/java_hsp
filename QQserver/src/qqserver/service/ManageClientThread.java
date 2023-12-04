@@ -10,8 +10,13 @@ import java.util.Iterator;
  * 该类管理client 连接 server的线程
  */
 public class ManageClientThread {
+
     // key 是userId， value 是线程
     private static HashMap<String, ServerConnectClientThread> hm = new HashMap<>();
+
+    public static HashMap<String, ServerConnectClientThread> getHm() {
+        return hm;
+    }
 
     // 将某个线程加入到集合
     public static void addClientThread(String userId, ServerConnectClientThread serverConnectClientThread) {

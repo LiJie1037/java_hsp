@@ -15,7 +15,7 @@ import java.util.Date;
  * 该类实现发送消息
  */
 public class MessageClientService {
-    // 私聊 Message
+    // 普通 Message
     public void sendMessageToOne(String content, String senderId, String getterId) {
         Message message = new Message();
         message.setMesType(MessageType.MESSAGE_COMM_MES);
@@ -37,6 +37,7 @@ public class MessageClientService {
         }
     }
 
+    // 群发消息
     public void sendMessageToAll(String content, String senderId) {
         Message message = new Message();
         message.setMesType(MessageType.MESSAGE_TO_ALL_MES);

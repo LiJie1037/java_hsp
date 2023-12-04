@@ -8,9 +8,12 @@ import qqcommon.User;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @version 1.0
@@ -21,7 +24,14 @@ public class QQServer {
     private ServerSocket ss = null;
 
     // 创建一个集合，存放多个合法用户
-    private static HashMap<String, User> validUsers = new HashMap<>();
+    private static ConcurrentHashMap<String, User> validUsers = new ConcurrentHashMap<>();
+
+    // key: getterId, value: message 存放离线消息
+    private static ConcurrentHashMap<String, ArrayList<Message>> offlineMes = new ConcurrentHashMap<>();
+
+    public static ConcurrentHashMap<String, ArrayList<Message>> getOfflineMes() {
+        return offlineMes;
+    }
 
     static {
         validUsers.put("100", new User("100", "123456"));
@@ -42,11 +52,24 @@ public class QQServer {
         return user.getPasswd().equals(passwd);
     }
 
+    private void outputOffLineMes(String getterId) {
+        if (offlineMes.get(getterId) != null) {
+            ArrayList<Message> messages = offlineMes.get(getterId);
+            for (Message offMessage : messages) {
+
+            }
+
+        }
+    }
+
     public QQServer() {
         try {
             System.out.println("服务器在9999端口监听");
+            // 启动服务器新闻通知线程
+            new Thread(new SendNewsToAllService()).start();
             ss = new ServerSocket(9999);
             while (true) {
+                // 监听连接
                 Socket socket = ss.accept();
 
                 // 得到 socket 关联的对象啊输入流
@@ -59,15 +82,30 @@ public class QQServer {
                 if (checkUser(u.getUserId(), u.getPasswd())) {// 登录成功
                     if (ManageClientThread.getClientThread(u.getUserId()) != null) {//用户已经登录
                         System.out.println("用户" + u.getUserId() + "已登录");
-                    }else {
+                    }else {// 登录成功
                         message.setMesType(MessageType.MESSAGE_LOGIN_SUCCEED);
                         oos.writeObject(message);
+
                         // 创建一个线程，和客户端保持通信，持有socket
                         ServerConnectClientThread s2cThread = new ServerConnectClientThread(socket, u.getUserId());
                         // 启动该线程
                         s2cThread.start();
                         ManageClientThread.addClientThread(u.getUserId(), s2cThread);
-                        System.out.println("服务器和用户" + u.getUserId() + "保持通信，读取数据");
+
+                        // 该用户 offlineMes 有留言
+                        if (offlineMes.containsKey(u.getUserId())) {
+                            // 输出 ArrayList 中的内容
+                            ObjectOutputStream oos2 = new ObjectOutputStream(s2cThread.getSocket().getOutputStream());
+
+                            ArrayList<Message> messages = offlineMes.get(u.getUserId());
+                            for (Message offMessage : messages) {
+                                System.out.println("这是" + offMessage.getSender() + "给" + u.getUserId() + "的留言,时间是" + offMessage.getSendTime());
+                                oos2.writeObject(offMessage);
+                            }
+
+                            // 移除留言
+                            offlineMes.remove(u.getUserId());
+                        }
                     }
                 } else {// 登录失败
                     message.setMesType(MessageType.MESSAGE_LOGIN_FAIL);

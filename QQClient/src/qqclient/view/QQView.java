@@ -44,6 +44,7 @@ public class QQView {
 
                     if (userClientService.checkUser(userId, pwd)) {
                         System.out.println("===========欢迎" + userId +"用户==========");
+                        //
                         while (loop) {
                             System.out.println("\n===========网络通信系统二级菜单（用户" + userId +"）==========");
                             System.out.println("\t\t 1 显示在线用户列表");
